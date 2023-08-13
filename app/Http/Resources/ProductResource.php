@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Resources;
+
+use App\Models\ProductType;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        $imagePath = $this->getMedia('images')[0]->getUrl();
+        return [
+            'id' => $this->id,
+            'type' => new ProductTypeResource($this->whenLoaded('type')),
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'summary' => $this->summary,
+            'detail' => $this->detail,
+            'category' => new ProductCategoryResource($this->whenLoaded('category')),
+            'attributes' => ProductAttributeResource::collection($this->whenLoaded('attribute')),
+            'regular_price' => $this->regular_price,
+            'sale_price' => $this->sale_price,
+            'stock_quantity' => $this->stock_quantity,
+            'total_sale' => $this->total_sale,
+            'tags' => ProductTagResource::collection($this->whenLoaded('tag')),
+            'images' => $imagePath,
+        ];
+    }
+}
