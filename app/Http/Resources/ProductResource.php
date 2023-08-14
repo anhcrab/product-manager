@@ -15,7 +15,9 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $imagePath = $this->getMedia('images')[0]->getUrl();
+//        $imagePath = $this->getFirstMedia('images')[0];
+//        $imageParts = explode('localhost', $imagePath);
+//        $image = $imageParts[0].'localhost:3000'.$imageParts[1];
         return [
             'id' => $this->id,
             'type' => new ProductTypeResource($this->whenLoaded('type')),
@@ -30,7 +32,7 @@ class ProductResource extends JsonResource
             'stock_quantity' => $this->stock_quantity,
             'total_sale' => $this->total_sale,
             'tags' => ProductTagResource::collection($this->whenLoaded('tag')),
-            'images' => $imagePath,
+            'images' => $this->getMedia('images'),
         ];
     }
 }

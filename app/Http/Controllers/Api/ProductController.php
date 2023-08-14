@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
-use App\Http\Resources\ProductTotalResource;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductCategory;
 use App\Models\ProductType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -29,7 +29,7 @@ class ProductController extends Controller
 //            ];
 //        }
 //        return response()->json($productList);
-        return ProductResource::collection(Product::all());
+        return response()->json(ProductResource::collection(Product::all()));
     }
 
     /**
@@ -43,9 +43,10 @@ class ProductController extends Controller
         $newProduct = Product::create([
             'type_id' => ProductType::firstOrCreate(['name' => $request->type])->id,
             'name' => $request->name,
+            'slug' => Str::slug($request->name),
             'summary' => $request->summary,
             'detail' => $request->detail,
-            'category_id' => ProductCategory::firstOrCreate(['name' => $request->name])->id,
+            'category_id' => ProductCategory::firstOrCreate(['name' => $request->category])->id,
             'regular_price' => $request->regular_price,
             'sale_price' => $request->sale_price,
             'stock_quantity' => $request->stock_quantity,
@@ -65,7 +66,7 @@ class ProductController extends Controller
     /**
      * Display the specified product.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
         $product = Product::findOrFail($id);
         $relatedProducts = Product::where('regular_price', $product->regular_price)
@@ -79,6 +80,15 @@ class ProductController extends Controller
             'product' => new ProductResource($product),
             'related_products' => ProductResource::collection($relatedProducts),
         ];
+    }
+
+    /**
+     * Display the specified product by slug
+     */
+    public function showBySlug(string $slug)
+    {
+        $id = Product::where('slug', $slug);
+        return $this->show($id);
     }
 
     /**

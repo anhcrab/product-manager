@@ -65,6 +65,7 @@ Route::prefix('/categories')->group(function () {
 Route::prefix('/product-attributes')->group(function () {
     Route::post('/', [ProductAttributeController::class, 'store']);
     Route::get('/{id}', [ProductAttributeController::class, 'show']);
+    Route::get('/{slug}', [ProductAttributeController::class, 'showBySlug']);
     Route::put('/{id}', [ProductAttributeController::class, 'update']);
     Route::delete('/{id}', [ProductAttributeController::class, 'destroy']);
 });
