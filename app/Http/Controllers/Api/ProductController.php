@@ -8,8 +8,10 @@ use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductCategory;
 use App\Models\ProductType;
+use http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use function Laravel\Prompts\error;
 
 class ProductController extends Controller
 {
@@ -40,55 +42,58 @@ class ProductController extends Controller
         // Validate
 
         // Store the information in the database
-        $newProduct = Product::create([
-            'type_id' => ProductType::firstOrCreate(['name' => $request->type])->id,
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'summary' => $request->summary,
-            'detail' => $request->detail,
-            'category_id' => ProductCategory::firstOrCreate(['name' => $request->category])->id,
-            'regular_price' => $request->regular_price,
-            'sale_price' => $request->sale_price,
-            'stock_quantity' => $request->stock_quantity,
-            'total_sale' => $request->total_sale
-        ]);
+        try {
+            $newProduct = Product::create([
+                'type_id' => ProductType::firstOrCreate(['name' => $request->type])->id,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'summary' => $request->summary,
+                'detail' => $request->detail,
+                'category_id' => ProductCategory::firstOrCreate(['name' => $request->category])->id,
+                'regular_price' => $request->regular_price,
+                'sale_price' => $request->sale_price,
+                'stock_quantity' => $request->stock_quantity,
+                'total_sale' => $request->total_sale
+            ]);
 
-        // Store the image
-        if ($request->hasFile('images')){
+            // Store the image
+            if ($request->hasFile('images')){
 //            $imagePath = $request->file('images')->store('images');
-            $newProduct->addMediaFromRequest('images')->toMediaCollection('images');
+                $newProduct->addMediaFromRequest('images')->toMediaCollection('images');
+            }
+            return response()->json([
+                'message' => 'Created'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
-        return response()->json([
-            'message' => 'Created'
-        ], 200);
+
     }
 
     /**
      * Display the specified product.
-     */
-    public function show(int $id)
+     */public function show(string $id)
     {
         $product = Product::findOrFail($id);
-        $relatedProducts = Product::where('regular_price', $product->regular_price)
-            ->whereHas('category', function ($query) use ($product) {
-                $query->whereIn('id', $product->category->pluck('id'));
-            })
-            ->where('id', '!=', $product->id)
-            ->get();
+        $cat_id = $product->category_id;
+        $relatedProducts = ProductCategory::findOrFail($cat_id)->product();
 
         return [
             'product' => new ProductResource($product),
-            'related_products' => ProductResource::collection($relatedProducts),
+            'related_products' => $relatedProducts,
         ];
     }
+
 
     /**
      * Display the specified product by slug
      */
     public function showBySlug(string $slug)
     {
-        $id = Product::where('slug', $slug);
-        return $this->show($id);
+        return $this->show(Product::where('slug', $slug)->first()->id);
     }
 
     /**

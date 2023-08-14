@@ -33,22 +33,4 @@ class SearchController extends Controller
             'message' => 'No product found'
         ], 404);
     }
-
-    /**
-     * search products by name
-     */
-    public function searchProductByName()
-    {}
-
-    /**
-     * search products by type
-     */
-    public function searchProductByType()
-    {}
-
-    /**
-     * search products by category
-     */
-    public function searchProductByCategory()
-    {}
 }

@@ -31,7 +31,8 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
 
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+//Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{slug}', [ProductController::class, 'showBySlug']);
 Route::get('/product-types', [ProductTypeController::class, 'index']);
 Route::get('/product-categories', [ProductCategoryController::class, 'index']);
 Route::get('/product-attributes', [ProductAttributeController::class, 'index']);
@@ -51,12 +52,14 @@ Route::prefix('/products')->group(function () {
     Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
 Route::prefix('/types')->group(function () {
+    Route::get('/', [ProductTypeController::class, 'index']);
     Route::post('/', [ProductTypeController::class, 'store']);
     Route::get('/{id}', [ProductTypeController::class, 'show']);
     Route::put('/{id}', [ProductTypeController::class, 'update']);
     Route::delete('/{id}', [ProductTypeController::class, 'destroy']);
 });
 Route::prefix('/categories')->group(function () {
+    Route::get('/', [ProductCategoryController::class, 'index']);
     Route::post('/', [ProductCategoryController::class, 'store']);
     Route::get('/{id}', [ProductCategoryController::class, 'show']);
     Route::put('/{id}', [ProductCategoryController::class, 'update']);
@@ -65,7 +68,6 @@ Route::prefix('/categories')->group(function () {
 Route::prefix('/product-attributes')->group(function () {
     Route::post('/', [ProductAttributeController::class, 'store']);
     Route::get('/{id}', [ProductAttributeController::class, 'show']);
-    Route::get('/{slug}', [ProductAttributeController::class, 'showBySlug']);
     Route::put('/{id}', [ProductAttributeController::class, 'update']);
     Route::delete('/{id}', [ProductAttributeController::class, 'destroy']);
 });
@@ -75,4 +77,6 @@ Route::prefix('/product-tags')->group(function () {
     Route::put('/{id}', [ProductTagController::class, 'update']);
     Route::delete('/{id}', [ProductTagController::class, 'destroy']);
 });
+Route::post('/search',[\App\Http\Controllers\Api\SearchController::class, 'searchProductByRelatedString']);
+
 
