@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductCategory;
 use App\Models\ProductType;
+use App\Models\RatingComment;
 use http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -75,15 +76,20 @@ class ProductController extends Controller
 
     /**
      * Display the specified product.
-     */public function show(string $id)
+     */
+    public function show(int $id)
     {
         $product = Product::findOrFail($id);
         $cat_id = $product->category_id;
-        $relatedProducts = ProductCategory::findOrFail($cat_id)->product();
+        $relatedProducts = Product::where('category_id', '=', $cat_id)
+            ->where('slug', '!=', $product->slug)
+            ->inRandomOrder()->take(10)->get();
+        $nonRelatedProducts = Product::where('category_id', '!=', $cat_id)->take(10)->get();
 
         return [
             'product' => new ProductResource($product),
             'related_products' => $relatedProducts,
+            'non_related_products' => $nonRelatedProducts,
         ];
     }
 
@@ -102,7 +108,16 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = Product::findOrFail($id);
-        $product->name = $request->input('name');
+        $product->type_id = ProductType::where('name', $request->type)->first()->get()->id;
+        $product->name = $request->name;
+        $product->slug = $request->slug;
+        $product->summary = $request->summary;
+        $product->detail = $request->detail;
+        $product->category_id = ProductCategory::where('name', $request->category)->first()->get()->id;
+        $product->regular_price = $request->regular_price;
+        $product->sale_price = $request->sale_price;
+        $product->stock_quantity = $request->stock_quantity;
+        $product->total_sale = $request->total_sale;
         $product->save();
         return response()->json([
             'message' => 'Updated type of products successfully.'

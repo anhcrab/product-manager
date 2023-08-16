@@ -9,6 +9,6 @@ class CartItemCollection extends ResourceCollection
 {
     public function toArray(Request $request)
     {
-        return $this->collection;
+        //
     }
 }

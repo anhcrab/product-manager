@@ -16,8 +16,13 @@ class CartItemResource extends JsonResource
         return [
             'product_id' => $this->product_id,
             'price' => $product->sale_price ?: $product->regular_price,
-            'Name' => $product->Name,
+            'name' => $product->name,
             'quantity' => $this->quantity,
+            'images' => $product->getMedia('images')->map(function ($media) {
+                $imageParts = explode('localhost', $media->getUrl());
+                $image = $imageParts[0].'localhost:3000'.$imageParts[1];
+                return $image;
+            }),
         ];
     }
 }

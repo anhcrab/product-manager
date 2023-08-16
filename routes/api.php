@@ -11,6 +11,7 @@ use \App\Http\Controllers\Api\ProductTypeController;
 use \App\Http\Controllers\Api\ProductCategoryController;
 use \App\Http\Controllers\Api\ProductAttributeController;
 use \App\Http\Controllers\Api\ProductTagController;
+use \App\Http\Controllers\Api\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +32,7 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
 
 Route::get('/products', [ProductController::class, 'index']);
-//Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/get/{id}', [ProductController::class, 'show']);
 Route::get('/products/{slug}', [ProductController::class, 'showBySlug']);
 Route::get('/product-types', [ProductTypeController::class, 'index']);
 Route::get('/product-categories', [ProductCategoryController::class, 'index']);
@@ -78,5 +79,18 @@ Route::prefix('/product-tags')->group(function () {
     Route::delete('/{id}', [ProductTagController::class, 'destroy']);
 });
 Route::post('/search',[\App\Http\Controllers\Api\SearchController::class, 'searchProductByRelatedString']);
-
-
+Route::prefix('/carts')->group(function () {
+    Route::get('/{device}', [CartController::class, 'show']);
+    Route::post('/', [CartController::class, 'store']);
+    Route::delete('/{device}', [CartController::class, 'destroy']);
+    Route::post('/add', [CartController::class, 'addProducts']);
+    Route::post('/remove', [CartController::class, 'removeProducts']);
+});
+Route::prefix('/shop')->group(function () {
+    Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
+    Route::post('sort', [\App\Http\Controllers\Api\ShopController::class, 'sort']);
+    Route::post('filter/total', [\App\Http\Controllers\Api\ShopController::class, 'total']);
+});
+Route::prefix('rate')->group(function () {
+    Route::get('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, '']);
+});

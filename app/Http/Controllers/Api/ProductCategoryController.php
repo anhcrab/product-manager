@@ -38,9 +38,10 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $type = ProductCategory::findOrFail($id);
-        $type->name = $request->input('name');
-        $type->save();
+        $cat = ProductCategory::findOrFail($id);
+        $cat->name = $request->name;
+        $cat->slug = $request->slug;
+        $cat->save();
         return response()->json([
             'message' => 'Updated type of products successfully.'
         ], 200);

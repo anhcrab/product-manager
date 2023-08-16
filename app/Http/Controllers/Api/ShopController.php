@@ -9,14 +9,49 @@ use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
-    public function filter(Request $request)
+    public function total(Request $request)
     {
-
+        $filter = $request->filter;
+        $sort = $request->sort;
+//        return $filter;
+        return response()->json($this->filter($this->sort($sort), $filter));
+    }
+    public function filter($products, $filters)
+    {
+        foreach ($filters as $filter) {
+            switch ($filter) {
+                case "Dưới 100.000₫":
+                    $products->filter(function ($value) {
+                        return $value->regular_price < 100000;
+                    });
+                    break;
+                case "100.000₫ - 250.000₫":
+                    $products->filter(function ($value) {
+                        return $value->regular_price >= 100000 && $value->regular_price <= 250000;
+                    });
+                    break;
+                case "250.000₫ - 500.000₫":
+                    $products->filter(function ($value) {
+                        return $value->regular_price > 250000 && $value->regular_price < 500000;
+                    });
+                    break;
+                case "500.000₫ - 800.000₫":
+                    $products->filter(function ($value) {
+                        return $value->regular_price >= 500000 && $value->regular_price <= 800000;
+                    });
+                    break;
+                case "Trên 800.000₫":
+                    $products->filter(function ($value) {
+                        return $value->regular_price < 800000;
+                    });
+                    break;
+            }
+        }
+        return $products;
     }
 
-    public function sort(Request $request)
+    public function sort($sort)
     {
-        $sort = $request->sort;
         switch ($sort){
             case 'price:asc':
                 return ProductResource::collection(Product::all())->collection->sort(function ($p1, $p2) {

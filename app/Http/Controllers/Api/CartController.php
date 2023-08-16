@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\CartItemResource;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Http\Controllers\Controller;
@@ -16,7 +17,7 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $cart = Cart::create([
-            // TODO: create new cart
+            'device' => $request->device
         ]);
         return response()->json([
             'Message' => 'A new cart have been created for you!',
@@ -25,81 +26,66 @@ class CartController extends Controller
     }
 
 
-    public function show(Request $request)
+    public function show(Request $request, string $device)
     {
-        $device = $request->input('device');
-        $cart = Cart::where('device', $device);
+        $cart = Cart::where('device', $device)->first();
+        CartItem::where('cart_id', $cart->id)->get()
+            ->map(function ($c) {
+                return Product::findOrFail($c->product_id);
+            });
         return response()->json([
-            'cart' => Cart::findOrFail($device),
-            'Items in Cart' => new CartItemCollection(),
+            'cart' => $cart,
+            'items' => CartItemResource::collection(CartItem::where('cart_id', $cart->id)->get())
         ], 200);
 
     }
 
 
-    public function destroy(Cart $cart, Request $request)
+    public function destroy(Request $request, string $device)
     {
-        $validator = Validator::make($request->all(), [
-            'cartKey' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-            ], 400);
-        }
-
-        $cartKey = $request->input('cartKey');
-
-        if ($cart->key == $cartKey) {
-            $cart->delete();
-            return response()->json(null, 204);
-        } else {
-            return response()->json([
-                'message' => 'The CarKey you provided does not match the Cart Key for this Cart.',
-            ], 400);
-        }
-
+        $cart = Cart::where('device', $request->device);
+        $cart->delete();
+        return response()->json(null, 204);
     }
 
 
-    public function addProducts(Cart $cart, Request $request)
+    public function addProducts(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'cartKey' => 'required',
-            'productID' => 'required',
-            'quantity' => 'required|numeric|min:1|max:10',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-            ], 400);
-        }
-
-        $cartKey = $request->input('cartKey');
-        $productID = $request->input('productID');
-        $quantity = $request->input('quantity');
-
-        if ($cart->key == $cartKey) {
-            $Product = Product::findOrFail($productID);
-
-            $cartItem = CartItem::where(['cart_id' => $cart->getKey(), 'product_id' => $productID])->first();
-            if ($cartItem) {
-                $cartItem->quantity = $quantity;
-                CartItem::where(['cart_id' => $cart->getKey(), 'product_id' => $productID])->update(['quantity' => $quantity]);
-            } else {
-                CartItem::create(['cart_id' => $cart->getKey(), 'product_id' => $productID, 'quantity' => $quantity]);
-            }
-
-            return response()->json(['message' => 'The Cart was updated with the given product information successfully'], 200);
-
+        $cart = Cart::where('device', $request->device)->first();
+        $quantity = $request->quantity;
+        $product = Product::findOrFail($request->product_id);
+        $cartItem = CartItem::where([
+            'cart_id' => $cart->getKey(),
+            'product_id' => $request->product_id
+        ])->first();
+        if ($cartItem) {
+            $cartItem->quantity = $quantity;
+            CartItem::where([
+                'cart_id' => $cart->id,
+                'product_id' => $request->product_id
+            ])->update(['quantity' => $quantity]);
         } else {
-
-            return response()->json([
-                'message' => 'The CarKey you provided does not match the Cart Key for this Cart.',
-            ], 400);
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => $quantity
+            ]);
         }
+        return response()->json([
+            'message' => 'The Cart was updated with the given product information successfully'
+        ], 200);
 
+    }
+
+    public function removeProducts(Request $request)
+    {
+        $item = CartItem::where([
+            'cart_id' => Cart::where('device', $request->device)->first()->id,
+            'product_id' => $request->product_id
+        ]);
+        $item->delete();
+        return response()->json([
+            'message' => 'deleted'
+        ], 200);
     }
 }
