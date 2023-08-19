@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\ProductAttribute;
+use App\Models\ProductCategory;
 use App\Models\ProductType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,13 +19,13 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'type' => new ProductTypeResource($this->whenLoaded('type')),
+            'type' => ProductType::findOrFail($this->type_id)->name,
             'name' => $this->name,
             'slug' => $this->slug,
             'summary' => $this->summary,
             'detail' => $this->detail,
-            'category' => new ProductCategoryResource($this->whenLoaded('category')),
-            'attributes' => ProductAttributeResource::collection($this->whenLoaded('attribute')),
+            'category' => ProductCategory::findOrFail($this->category_id)->name,
+            'attributes' => ProductAttributeResource::collection(ProductAttribute::where('product_id', $this->id)->get()),
             'regular_price' => $this->regular_price,
             'sale_price' => $this->sale_price,
             'stock_quantity' => $this->stock_quantity,

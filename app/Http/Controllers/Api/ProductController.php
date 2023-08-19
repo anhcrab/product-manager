@@ -56,7 +56,12 @@ class ProductController extends Controller
                 'stock_quantity' => $request->stock_quantity,
                 'total_sale' => $request->total_sale
             ]);
-
+            ProductAttribute::create([
+                'product_id' => $newProduct->id,
+                'type' => $request->attribute_type,
+                'name' => $request->attribute_type,
+                'code' => $request->attribute_code
+            ]);
             // Store the image
             if ($request->hasFile('images')){
 //            $imagePath = $request->file('images')->store('images');
@@ -81,10 +86,10 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $cat_id = $product->category_id;
-        $relatedProducts = Product::where('category_id', '=', $cat_id)
+        $relatedProducts = ProductResource::collection(Product::where('category_id', '=', $cat_id)
             ->where('slug', '!=', $product->slug)
-            ->inRandomOrder()->take(10)->get();
-        $nonRelatedProducts = Product::where('category_id', '!=', $cat_id)->take(10)->get();
+            ->inRandomOrder()->take(10)->get());
+        $nonRelatedProducts = ProductResource::collection(Product::where('category_id', '!=', $cat_id)->take(10)->get());
 
         return [
             'product' => new ProductResource($product),

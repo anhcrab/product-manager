@@ -25,6 +25,14 @@ class UserController extends Controller
         return response()->json($newUser, 204);
     }
 
+    public function fb(Request $request)
+    {
+        $user = User::firstOrCreate(['email' => $request->email]);
+        $user->fb_id = $request->id;
+        $user->save;
+        response()->json([], 204);
+    }
+
     /**
      * Display the specified user.
      */

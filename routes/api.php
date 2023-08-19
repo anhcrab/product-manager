@@ -42,12 +42,14 @@ Route::get('/product-tags', [ProductTagController::class, 'index']);
 Route::prefix('/users')->middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::post('/', [UserController::class, 'store']);
+    Route::put('log-fb', [UserController::class, 'fb']);
     Route::get('/{id}', [UserController::class, 'show']);
     Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/{id}', [UserController::class, 'destroy']);
 });
 
 Route::prefix('/products')->group(function () {
+//    Route::get('/', [ProductController::class, 'index']);
     Route::post('/', [ProductController::class, 'store']);
     Route::put('/{id}', [ProductController::class, 'update']);
     Route::delete('/{id}', [ProductController::class, 'destroy']);
@@ -91,6 +93,31 @@ Route::prefix('/shop')->group(function () {
     Route::post('sort', [\App\Http\Controllers\Api\ShopController::class, 'sort']);
     Route::post('filter/total', [\App\Http\Controllers\Api\ShopController::class, 'total']);
 });
-Route::prefix('rate')->group(function () {
-    Route::get('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, '']);
+Route::prefix('/comments-ratings')->group(function () {
+    Route::get('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'show']);
+    Route::post('/{slug}/new', [\App\Http\Controllers\Api\RatingCommentController::class, 'store']);
+    Route::put('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'update']);
+});
+
+Route::prefix('/orders')->group(function (){
+    Route::prefix('payment')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\orders\PayController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Api\orders\PayController::class, 'store']);
+        Route::get('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'show']);
+        Route::put('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'update']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'destroy']);
+    });
+    Route::prefix('shipping')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\orders\ShipController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Api\orders\ShipController::class, 'store']);
+        Route::get('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'show']);
+        Route::put('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'update']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'destroy']);
+    });
+    Route::get('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'index'])
+        ->middleware('auth:sanctum');
+    Route::post('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'store']);
+    Route::get('/{slug}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'showBySlug']);
+    Route::put('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'update']);
+    Route::delete('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'destroy']);
 });
