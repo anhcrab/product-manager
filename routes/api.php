@@ -16,6 +16,7 @@ use \App\Http\Controllers\Api\orders\BanksController;
 use \App\Http\Controllers\Api\orders\StoresController;
 use \App\Http\Controllers\Api\orders\ShippingController;
 use \App\Http\Controllers\Api\orders\PaymentController;
+use \App\Http\Controllers\Api\inventory\InventoriesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -222,4 +223,22 @@ Route::prefix('/shipping')->group(function () {
     Route::get('/{id}', [ShippingController::class, 'show']);
     Route::put('/{id}', [ShippingController::class, 'update']);
     Route::delete('/{id}', [ShippingController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Inventories Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/shipping')->group(function () {
+    Route::get('/', [InventoriesController::class, 'index']);
+    Route::post('/', [InventoriesController::class, 'store']);
+    Route::get('/{id}', [InventoriesController::class, 'show']);
+    Route::put('/{id}', [InventoriesController::class, 'update']);
+    Route::delete('/{id}', [InventoriesController::class, 'destroy']);
 });
