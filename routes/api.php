@@ -12,6 +12,10 @@ use \App\Http\Controllers\Api\ProductCategoryController;
 use \App\Http\Controllers\Api\ProductAttributeController;
 use \App\Http\Controllers\Api\ProductTagController;
 use \App\Http\Controllers\Api\CartController;
+use \App\Http\Controllers\Api\orders\BanksController;
+use \App\Http\Controllers\Api\orders\StoresController;
+use \App\Http\Controllers\Api\orders\ShippingController;
+use \App\Http\Controllers\Api\orders\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +35,16 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
 
+/*
+|--------------------------------------------------------------------------
+| Shop page Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/get/{id}', [ProductController::class, 'show']);
 Route::get('/products/{slug}', [ProductController::class, 'showBySlug']);
@@ -39,6 +53,16 @@ Route::get('/product-categories', [ProductCategoryController::class, 'index']);
 Route::get('/product-attributes', [ProductAttributeController::class, 'index']);
 Route::get('/product-tags', [ProductTagController::class, 'index']);
 
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 Route::prefix('/users')->middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::post('/', [UserController::class, 'store']);
@@ -49,9 +73,8 @@ Route::prefix('/users')->middleware(['auth:sanctum', 'admin'])->group(function (
 });
 
 Route::prefix('/products')->group(function () {
-//    Route::get('/', [ProductController::class, 'index']);
     Route::post('/', [ProductController::class, 'store']);
-    Route::put('/{id}', [ProductController::class, 'update']);
+    Route::post('/update/{id}', [ProductController::class, 'update']);
     Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
 Route::prefix('/types')->group(function () {
@@ -68,7 +91,7 @@ Route::prefix('/categories')->group(function () {
     Route::put('/{id}', [ProductCategoryController::class, 'update']);
     Route::delete('/{id}', [ProductCategoryController::class, 'destroy']);
 });
-Route::prefix('/product-attributes')->group(function () {
+Route::prefix('/attributes')->group(function () {
     Route::post('/', [ProductAttributeController::class, 'store']);
     Route::get('/{id}', [ProductAttributeController::class, 'show']);
     Route::put('/{id}', [ProductAttributeController::class, 'update']);
@@ -81,12 +104,24 @@ Route::prefix('/product-tags')->group(function () {
     Route::delete('/{id}', [ProductTagController::class, 'destroy']);
 });
 Route::post('/search',[\App\Http\Controllers\Api\SearchController::class, 'searchProductByRelatedString']);
+
+/*
+|--------------------------------------------------------------------------
+| Cart Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 Route::prefix('/carts')->group(function () {
     Route::get('/{device}', [CartController::class, 'show']);
     Route::post('/', [CartController::class, 'store']);
-    Route::delete('/{device}', [CartController::class, 'destroy']);
+//    Route::delete('/{device}', [CartController::class, 'destroy']);
     Route::post('/add', [CartController::class, 'addProducts']);
     Route::post('/remove', [CartController::class, 'removeProducts']);
+    Route::get('/clear', [CartController::class, 'clearProducts']);
 });
 Route::prefix('/shop')->group(function () {
     Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
@@ -99,25 +134,92 @@ Route::prefix('/comments-ratings')->group(function () {
     Route::put('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'update']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Order Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 Route::prefix('/orders')->group(function (){
-    Route::prefix('payment')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\orders\PayController::class, 'index']);
-        Route::post('/', [\App\Http\Controllers\Api\orders\PayController::class, 'store']);
-        Route::get('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'show']);
-        Route::put('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'update']);
-        Route::delete('/{id}', [\App\Http\Controllers\Api\orders\PayController::class, 'destroy']);
-    });
-    Route::prefix('shipping')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\orders\ShipController::class, 'index']);
-        Route::post('/', [\App\Http\Controllers\Api\orders\ShipController::class, 'store']);
-        Route::get('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'show']);
-        Route::put('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'update']);
-        Route::delete('/{id}', [\App\Http\Controllers\Api\orders\ShipController::class, 'destroy']);
-    });
-    Route::get('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'index'])
-        ->middleware('auth:sanctum');
+    Route::get('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'index']);
     Route::post('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'store']);
     Route::get('/{slug}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'showBySlug']);
     Route::put('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'update']);
     Route::delete('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Banks Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/banks')->group(function () {
+   Route::get('/', [BanksController::class, 'index']);
+   Route::post('/', [BanksController::class, 'store']);
+   Route::get('/{id}', [BanksController::class, 'show']);
+   Route::put('/{id}', [BanksController::class, 'update']);
+   Route::delete('/{id}', [BanksController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Stores Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/stores')->group(function () {
+    Route::get('/', [StoresController::class, 'index']);
+    Route::post('/', [StoresController::class, 'store']);
+    Route::get('/{id}', [StoresController::class, 'show']);
+    Route::put('/{id}', [StoresController::class, 'update']);
+    Route::delete('/{id}', [StoresController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Payment Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/payment')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::post('/', [PaymentController::class, 'store']);
+    Route::get('/{id}', [PaymentController::class, 'show']);
+    Route::put('/{id}', [PaymentController::class, 'update']);
+    Route::delete('/{id}', [PaymentController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Shipping Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/shipping')->group(function () {
+    Route::get('/', [ShippingController::class, 'index']);
+    Route::post('/', [ShippingController::class, 'store']);
+    Route::get('/{id}', [ShippingController::class, 'show']);
+    Route::put('/{id}', [ShippingController::class, 'update']);
+    Route::delete('/{id}', [ShippingController::class, 'destroy']);
 });

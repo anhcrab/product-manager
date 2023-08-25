@@ -24,13 +24,19 @@ class SearchController extends Controller
      */
     public function searchProductByRelatedString(Request $request)
     {
-        $category = ProductCategory::where('name', 'like', '%' . $request->search_keyword . '%')->get('id');
-        $products = Product::with('category')
-            ->whereHas('category',
-                function ($query) use ($category) {
-                    $query->whereIn('id', $category);
-                }
-        )->get();
-        return response()->json($products);
+        try {
+            $category = ProductCategory::where('name', 'like', '%' . $request->search_keyword . '%')->get('id');
+            $products = Product::with('category')
+                ->whereHas('category',
+                    function ($query) use ($category) {
+                        $query->whereIn('id', $category);
+                    }
+                )->get();
+            return response()->json($products);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 }

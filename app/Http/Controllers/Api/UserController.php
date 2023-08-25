@@ -13,7 +13,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response()->json(User::all());
+        try {
+            return response()->json(User::all());
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -21,16 +27,28 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $newUser = User::create($request->all());
-        return response()->json($newUser, 204);
+        try {
+            $newUser = User::create($request->all());
+            return response()->json($newUser, 204);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 
     public function fb(Request $request)
     {
-        $user = User::firstOrCreate(['email' => $request->email]);
-        $user->fb_id = $request->id;
-        $user->save;
-        response()->json([], 204);
+        try {
+            $user = User::firstOrCreate(['email' => $request->email]);
+            $user->fb_id = $request->id;
+            $user->save;
+            response()->json([], 204);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -38,7 +56,13 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        return response()->json(User::findOrFail($id));
+        try {
+            return response()->json(User::findOrFail($id));
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -46,13 +70,19 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->save();
-        return response()->json([
-            'message' => 'Updated user successfully.'
-        ], 204);
+        try {
+            $user = User::findOrFail($id);
+            $user->name = $request->input('name');
+            $user->email = $request->input('email');
+            $user->save();
+            return response()->json([
+                'message' => 'Updated user successfully.'
+            ], 204);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 
 
@@ -61,9 +91,15 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        User::findOrFail($id)->delete();
-        return response()->json([
-            'message' => 'Delete user successfully.'
-        ], 204);
+        try {
+            User::findOrFail($id)->delete();
+            return response()->json([
+                'message' => 'Delete user successfully.'
+            ], 204);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 }

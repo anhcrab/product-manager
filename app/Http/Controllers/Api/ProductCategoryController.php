@@ -21,8 +21,15 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $newType = ProductCategory::create($request->all());
-        return response()->json($newType, 204);
+        try {
+            $newType = ProductCategory::create($request->all());
+            return response()->json($newType, 204);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'msg' => $th->getMessage(),
+            ]);
+        }
+
     }
 
     /**
@@ -38,13 +45,21 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $cat = ProductCategory::findOrFail($id);
-        $cat->name = $request->name;
-        $cat->slug = $request->slug;
-        $cat->save();
-        return response()->json([
-            'message' => 'Updated type of products successfully.'
-        ], 200);
+        try {
+            $cat = ProductCategory::findOrFail($id);
+            $cat->name = $request->name;
+            $cat->category_id = $request->category_id;
+            $cat->slug = $request->slug;
+            $cat->save();
+            return response()->json([
+                'message' => 'Updated type of products successfully.'
+            ], 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
+
     }
 
     /**

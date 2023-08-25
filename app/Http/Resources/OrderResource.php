@@ -26,8 +26,9 @@ class OrderResource extends JsonResource
             'full_name' => $this->full_name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'payment' => PaymentMethodResource::collection(PaymentMethod::findOrFail($this->payment_method_id)->first()),
-            'shipping' => ShippingMethod::findOrFail($this->shipping_method_id)->first()
+            'payment' => PaymentMethodResource::make(PaymentMethod::findOrFail($this->payment_method_id)->first()),
+            'shipping' => ShippingMethod::findOrFail($this->shipping_method_id)->first(),
+            'store' => $this->store,
         ];
     }
 }

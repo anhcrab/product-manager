@@ -11,36 +11,64 @@ class RatingCommentController extends Controller
 {
     public function show(string $slug)
     {
-        return response()->json(RatingComment::where('product_id', Product::where('slug', $slug)->first()->id)->get());
+        try {
+            return response()->json(RatingComment::where('product_id', Product::where('slug', $slug)->first()->id)->get());
 //        return Product::where('slug', $slug)->first()->id;
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
+
     }
     public function store(Request $request, string $slug)
     {
-        if (RatingComment::where('device', $request->device)->first()) {
-            return $this->update($request, $slug);
+        try {
+            if (RatingComment::where('device', $request->device)->first()) {
+                $this->update($request, $slug);
+            } else {
+                $client_rate = RatingComment::create([
+                    'device' => $request->device,
+                    'product_id' => $request->product_id,
+                    'content' => $request->comment_content,
+                    'rating_star' => $request->rating_star,
+                ]);
+                return response()->json([
+                    'msg' => 'success',
+                    'client' => $client_rate
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
         }
-        $client_rate = RatingComment::create([
-            'device' => $request->device,
-            'product_id' => Product::where('slug', $slug)->first()->id,
-            'content' => $request->comment_content,
-            'rating_star' => $request->rating_stars,
-        ]);
-        return response()->json([
-            'msg' => 'success'
-        ], 200);
     }
     public function update(Request $request, string $slug)
     {
-        $client = RatingComment::findOrFail($request->comment_id)->first();
-        $client->content = $request->comment_content;
-        $client->rating_star = $request->rating_stars;
-        return response()->json([
-            'msg' => 'success'
-        ], 200);
+        try {
+            $client = RatingComment::findOrFail($request->comment_id)->first();
+            $client->content = $request->comment_content;
+            $client->rating_star = $request->rating_star;
+            return response()->json([
+                'msg' => 'success'
+            ], 200);
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
+
     }
 
     public function rating(string $slug)
     {
-        return ;
+        try {
+            return ;
+        } catch (\Throwable $th) {
+            return \response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
     }
 }
