@@ -30,7 +30,7 @@ class ShippingController extends Controller
         try {
             $shipping = Shipping::create([
                 'name' => $request->name,
-                'number' => $request->number,
+                'price' => $request->price,
             ]);
             return response()->json($shipping, 200);
         } catch (\Throwable $throwable) {
@@ -62,7 +62,7 @@ class ShippingController extends Controller
         try {
             $shipping = Shipping::findOrFail($id);
             $shipping->name = $request->name;
-            $shipping->number = $request->number;
+            $shipping->price = $request->price;
             $shipping->save();
             return response()->json([
                 'msg' => 'success'

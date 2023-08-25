@@ -29,8 +29,8 @@ class PaymentController extends Controller
     {
         try {
             $payment = Payment::create([
-                'name' => $request->name,
-                'number' => $request->number,
+                'type' => $request->type,
+                'detail' => $request->detail,
             ]);
             return response()->json($payment, 200);
         } catch (\Throwable $throwable) {
@@ -61,8 +61,8 @@ class PaymentController extends Controller
     {
         try {
             $payment = Payment::findOrFail($id);
-            $payment->name = $request->name;
-            $payment->number = $request->number;
+            $payment->type = $request->type;
+            $payment->detail = $request->detail;
             $payment->save();
             return response()->json([
                 'msg' => 'success'
