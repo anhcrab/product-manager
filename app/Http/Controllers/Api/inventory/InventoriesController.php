@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\inventory;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inventory\Inventory;
 use Illuminate\Http\Request;
 
 class InventoriesController extends Controller
@@ -12,7 +13,13 @@ class InventoriesController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            return response()->json(Inventory::all(), 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -20,7 +27,17 @@ class InventoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $payment = Inventory::create([
+                'type' => $request->type,
+                'detail' => $request->detail,
+            ]);
+            return response()->json($payment, 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -28,7 +45,13 @@ class InventoriesController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            return response()->json(Inventory::findOrFail($id), 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -36,7 +59,19 @@ class InventoriesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $inventory = Inventory::findOrFail($id);
+            $inventory->type = $request->type;
+            $inventory->detail = $request->detail;
+            $inventory->save();
+            return response()->json([
+                'msg' => 'success'
+            ], 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -44,6 +79,16 @@ class InventoriesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $inventory = Inventory::findOrFail($id);
+            $inventory->delete();
+            return response()->json([
+                'msg' => 'success'
+            ], 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 }

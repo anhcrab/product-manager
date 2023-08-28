@@ -14,7 +14,13 @@ class ProductAttributeController extends Controller
      */
     public function index()
     {
-        return response()->json(ProductType::all());
+        try {
+            return response()->json(ProductAttribute::all());
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -22,16 +28,28 @@ class ProductAttributeController extends Controller
      */
     public function store(Request $request)
     {
-        $newAttr = ProductType::create($request->all());
-        return response()->json($newAttr, 204);
+        try {
+            $newAttr = ProductAttribute::create($request->all());
+            return response()->json($newAttr, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'msg' => $th->getMessage()
+            ], 200);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        return response()->json(ProductAttribute::findOrFail($id));
+        try {
+            return response()->json(ProductAttribute::findOrFail($id));
+        } catch (\Throwable $th) {
+            return response()->json([
+                'msg' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -39,12 +57,20 @@ class ProductAttributeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $type = ProductAttribute::findOrFail($id);
-        $type->name = $request->input('name');
-        $type->save();
-        return response()->json([
-            'message' => 'Updated type of products successfully.'
-        ], 200);
+        try {
+            $attr = ProductAttribute::findOrFail($id);
+            $attr->type = $request->type;
+            $attr->name = $request->input('name');
+            $attr->code = $request->code;
+            $attr->save();
+            return response()->json([
+                'message' => 'Updated type of products successfully.'
+            ], 200);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'msg' => $throwable->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -52,9 +78,16 @@ class ProductAttributeController extends Controller
      */
     public function destroy(string $id)
     {
-        ProductAttribute::findOrFail($id)->delete();
-        return response()->json([
-            'message' => 'Delete products type successfully.'
-        ], 200);
+        try {
+            ProductAttribute::findOrFail($id)->delete();
+            return response()->json([
+                'message' => 'Delete products type successfully.'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'msg' => $th->getMessage()
+            ]);
+        }
+
     }
 }

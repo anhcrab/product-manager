@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
             'attributes' => ProductAttributeResource::collection(ProductAttribute::where('product_id', $this->id)->get()),
             'regular_price' => $this->regular_price,
             'sale_price' => $this->sale_price,
-            'stock_quantity' => $this->stock_quantity,
+            'quantity' => $this->stock_quantity,
             'total_sale' => $this->total_sale,
             'tags' => ProductTagResource::collection($this->whenLoaded('tag')),
             'images' => $this->getMedia('images')->map(function ($media) {
@@ -36,6 +36,7 @@ class ProductResource extends JsonResource
                 $image = $imageParts[0].'localhost:3000'.$imageParts[1];
                 return $image;
             }),
+            'date' => $this->created_at,
         ];
     }
 }

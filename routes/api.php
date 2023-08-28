@@ -93,6 +93,7 @@ Route::prefix('/categories')->group(function () {
     Route::delete('/{id}', [ProductCategoryController::class, 'destroy']);
 });
 Route::prefix('/attributes')->group(function () {
+    Route::get('/', [ProductAttributeController::class, 'index']);
     Route::post('/', [ProductAttributeController::class, 'store']);
     Route::get('/{id}', [ProductAttributeController::class, 'show']);
     Route::put('/{id}', [ProductAttributeController::class, 'update']);
@@ -122,7 +123,7 @@ Route::prefix('/carts')->group(function () {
 //    Route::delete('/{device}', [CartController::class, 'destroy']);
     Route::post('/add', [CartController::class, 'addProducts']);
     Route::post('/remove', [CartController::class, 'removeProducts']);
-    Route::get('/clear', [CartController::class, 'clearProducts']);
+    Route::post('/clear', [CartController::class, 'clearProducts']);
 });
 Route::prefix('/shop')->group(function () {
     Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
@@ -235,10 +236,22 @@ Route::prefix('/shipping')->group(function () {
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::prefix('/shipping')->group(function () {
+Route::prefix('/inventories')->group(function () {
     Route::get('/', [InventoriesController::class, 'index']);
     Route::post('/', [InventoriesController::class, 'store']);
     Route::get('/{id}', [InventoriesController::class, 'show']);
     Route::put('/{id}', [InventoriesController::class, 'update']);
     Route::delete('/{id}', [InventoriesController::class, 'destroy']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Gateway Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::get('/payment-gateway', [\App\Http\Controllers\Api\orders\PaymentGatewayController::class, 'vnPay']);

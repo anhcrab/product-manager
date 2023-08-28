@@ -32,25 +32,26 @@ class OrderContronller extends Controller
     {
         try {
             $order = Order::create([
-                'uuid' => uuid_create(),
                 'products' => json_encode($request->products),
                 'total_price' => $request->total_price,
-                'user_device' => $request->user_device,
+                'device_id' => $request->user_device,
                 'address' => $request->address,
-                'full_name' => $request->full_name,
+                'fullname' => $request->full_name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'shipping_method_id' => $request->shipping_id,
-                'payment_method_id' => $request->payment_id,
-                'store' => $request->store
+                'shipping_id' => $request->shipping_id,
+                'payment_id' => $request->payment_id,
+                'status' => $request->status
             ]);
             if($request->user_id){
                 $order->user_id = $request->user_id;
                 $order->save();
             }
-            return (new OrderResource($order));
+            return response()->json(new OrderResource($order), 200);
         } catch (Throwable $err){
-            return $err->getMessage();
+            return response()->json([
+                'msg' => $err->getMessage()
+            ]);
     }
 
     }

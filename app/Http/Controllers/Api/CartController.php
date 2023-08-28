@@ -123,7 +123,7 @@ class CartController extends Controller
         try {
             $cartId = Cart::where('device', $request->device)->first()->id;
             $items = CartItem::where([
-                'cart_id' => Cart::where('device', $request->device)->first()->id,
+                'cart_id' => $cartId,
             ])->get()->map(function ($item) {
                 $item->delete();
             });

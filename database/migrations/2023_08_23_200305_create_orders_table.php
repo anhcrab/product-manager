@@ -16,13 +16,13 @@ return new class extends Migration
             $table->string('device_id');
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('fullname')->nullable();
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->text('address');
+            $table->text('address')->nullable();
             $table->longText('products');
             $table->foreignId('shipping_id')->constrained()->cascadeOnDelete();
             $table->foreignId('payment_id')->constrained()->cascadeOnDelete();
-            $table->string('status');
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
