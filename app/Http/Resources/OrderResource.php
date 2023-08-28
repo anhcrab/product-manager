@@ -22,14 +22,14 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'products' => json_decode($this->products),
             'total_price' => $this->total_price,
-            'device_id' => $this->device_id,
+            'device_id' => $this->user_device,
             'user_id' => $this->user_id,
             'address' => $this->address,
-            'full_name' => $this->full_name,
+            'fullname' => $this->fullname,
             'email' => $this->email,
             'phone' => $this->phone,
-            'payment' => Payment::findOrFail($this->payment_method_id)->first(),
-            'shipping' => Shipping::findOrFail($this->shipping_method_id)->first(),
+            'payment' => Payment::findOrFail($this->payment_id)->first(),
+            'shipping' => Shipping::findOrFail($this->shipping_id)->first(),
             'status' => $this->status,
         ];
     }

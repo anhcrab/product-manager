@@ -22,7 +22,7 @@ return new class extends Migration
             $table->longText('products');
             $table->foreignId('shipping_id')->constrained()->cascadeOnDelete();
             $table->foreignId('payment_id')->constrained()->cascadeOnDelete();
-            $table->string('status')->nullable();
+            $table->string('status')->default('accepted');
             $table->timestamps();
         });
     }

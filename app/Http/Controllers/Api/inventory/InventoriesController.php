@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\inventory;
 
 use App\Http\Controllers\Controller;
+
 use App\Models\Inventory\Inventory;
+
 use Illuminate\Http\Request;
 
 class InventoriesController extends Controller
@@ -20,8 +22,8 @@ class InventoriesController extends Controller
                 'msg' => $throwable->getMessage()
             ]);
         }
+        //
     }
-
     /**
      * Store a newly created resource in storage.
      */

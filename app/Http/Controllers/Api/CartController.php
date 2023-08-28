@@ -128,7 +128,7 @@ class CartController extends Controller
                 $item->delete();
             });
             return response()->json([
-                'message' => 'deleted'
+                'message' => 'cleared'
             ], 200);
         } catch (\Throwable $th) {
             return \response()->json([

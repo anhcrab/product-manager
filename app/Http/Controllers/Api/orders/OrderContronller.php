@@ -36,7 +36,7 @@ class OrderContronller extends Controller
                 'total_price' => $request->total_price,
                 'device_id' => $request->user_device,
                 'address' => $request->address,
-                'fullname' => $request->full_name,
+                'fullname' => $request->fullname,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'shipping_id' => $request->shipping_id,
