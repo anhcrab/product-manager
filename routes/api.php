@@ -92,7 +92,7 @@ Route::prefix('/categories')->group(function () {
     Route::delete('/{id}', [ProductCategoryController::class, 'destroy']);
 });
 Route::prefix('/attributes')->group(function () {
-    Route::get('/', [ProductAttributeController::class, 'index']);
+    Route::get('/', [ProductAttributeController::class, 'store']);
     Route::post('/', [ProductAttributeController::class, 'store']);
     Route::get('/{id}', [ProductAttributeController::class, 'show']);
     Route::put('/{id}', [ProductAttributeController::class, 'update']);
@@ -122,7 +122,7 @@ Route::prefix('/carts')->group(function () {
 //    Route::delete('/{device}', [CartController::class, 'destroy']);
     Route::post('/add', [CartController::class, 'addProducts']);
     Route::post('/remove', [CartController::class, 'removeProducts']);
-    Route::post('/clear', [CartController::class, 'clearProducts']);
+    Route::get('/clear', [CartController::class, 'clearProducts']);
 });
 Route::prefix('/shop')->group(function () {
     Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
