@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\orders\OrderContronller;
 use \Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use \App\Http\Controllers\Api\orders\BanksController;
 use \App\Http\Controllers\Api\orders\StoresController;
 use \App\Http\Controllers\Api\orders\ShippingController;
 use \App\Http\Controllers\Api\orders\PaymentController;
+use \App\Http\Controllers\Api\orders\PaymentGatewayController;
+use \App\Http\Controllers\Api\transaction\TransactionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +31,7 @@ use \App\Http\Controllers\Api\orders\PaymentController;
 |
 */
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -64,47 +67,48 @@ Route::get('/product-tags', [ProductTagController::class, 'index']);
 |
 */
 Route::prefix('/users')->middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/', [UserController::class, 'index']);
-    Route::post('/', [UserController::class, 'store']);
-    Route::put('log-fb', [UserController::class, 'fb']);
-    Route::get('/{id}', [UserController::class, 'show']);
-    Route::put('/{id}', [UserController::class, 'update']);
-    Route::delete('/{id}', [UserController::class, 'destroy']);
+  Route::get('/', [UserController::class, 'index']);
+  Route::post('/', [UserController::class, 'store']);
+  Route::put('log-fb', [UserController::class, 'fb']);
+  Route::get('/{id}', [UserController::class, 'show']);
+  Route::put('/{id}', [UserController::class, 'update']);
+  Route::delete('/{id}', [UserController::class, 'destroy']);
 });
 
 Route::prefix('/products')->group(function () {
-    Route::post('/', [ProductController::class, 'store']);
-    Route::post('/update/{id}', [ProductController::class, 'update']);
-    Route::delete('/{id}', [ProductController::class, 'destroy']);
+  Route::post('/', [ProductController::class, 'store']);
+  Route::post('/update/{id}', [ProductController::class, 'update']);
+  // Route::put('/update-stock/{id}', [ProductController::class, 'updateBuying']); //Hàm này sẽ gây ra sự mất đồng nhất về dữ liệu ở cart và stock
+  Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
 Route::prefix('/types')->group(function () {
-    Route::get('/', [ProductTypeController::class, 'index']);
-    Route::post('/', [ProductTypeController::class, 'store']);
-    Route::get('/{id}', [ProductTypeController::class, 'show']);
-    Route::put('/{id}', [ProductTypeController::class, 'update']);
-    Route::delete('/{id}', [ProductTypeController::class, 'destroy']);
+  Route::get('/', [ProductTypeController::class, 'index']);
+  Route::post('/', [ProductTypeController::class, 'store']);
+  Route::get('/{id}', [ProductTypeController::class, 'show']);
+  Route::put('/{id}', [ProductTypeController::class, 'update']);
+  Route::delete('/{id}', [ProductTypeController::class, 'destroy']);
 });
 Route::prefix('/categories')->group(function () {
-    Route::get('/', [ProductCategoryController::class, 'index']);
-    Route::post('/', [ProductCategoryController::class, 'store']);
-    Route::get('/{id}', [ProductCategoryController::class, 'show']);
-    Route::put('/{id}', [ProductCategoryController::class, 'update']);
-    Route::delete('/{id}', [ProductCategoryController::class, 'destroy']);
+  Route::get('/', [ProductCategoryController::class, 'index']);
+  Route::post('/', [ProductCategoryController::class, 'store']);
+  Route::get('/{id}', [ProductCategoryController::class, 'show']);
+  Route::put('/{id}', [ProductCategoryController::class, 'update']);
+  Route::delete('/{id}', [ProductCategoryController::class, 'destroy']);
 });
 Route::prefix('/attributes')->group(function () {
-    Route::get('/', [ProductAttributeController::class, 'store']);
-    Route::post('/', [ProductAttributeController::class, 'store']);
-    Route::get('/{id}', [ProductAttributeController::class, 'show']);
-    Route::put('/{id}', [ProductAttributeController::class, 'update']);
-    Route::delete('/{id}', [ProductAttributeController::class, 'destroy']);
+  Route::get('/', [ProductAttributeController::class, 'index']);
+  Route::post('/', [ProductAttributeController::class, 'store']);
+  Route::get('/{id}', [ProductAttributeController::class, 'show']);
+  Route::put('/{id}', [ProductAttributeController::class, 'update']);
+  Route::delete('/{id}', [ProductAttributeController::class, 'destroy']);
 });
 Route::prefix('/product-tags')->group(function () {
-    Route::post('/', [ProductTagController::class, 'store']);
-    Route::get('/{id}', [ProductTagController::class, 'show']);
-    Route::put('/{id}', [ProductTagController::class, 'update']);
-    Route::delete('/{id}', [ProductTagController::class, 'destroy']);
+  Route::post('/', [ProductTagController::class, 'store']);
+  Route::get('/{id}', [ProductTagController::class, 'show']);
+  Route::put('/{id}', [ProductTagController::class, 'update']);
+  Route::delete('/{id}', [ProductTagController::class, 'destroy']);
 });
-Route::post('/search',[\App\Http\Controllers\Api\SearchController::class, 'searchProductByRelatedString']);
+Route::post('/search', [\App\Http\Controllers\Api\SearchController::class, 'searchProductByRelatedString']);
 
 /*
 |--------------------------------------------------------------------------
@@ -117,22 +121,23 @@ Route::post('/search',[\App\Http\Controllers\Api\SearchController::class, 'searc
 |
 */
 Route::prefix('/carts')->group(function () {
-    Route::get('/{device}', [CartController::class, 'show']);
-    Route::post('/', [CartController::class, 'store']);
-//    Route::delete('/{device}', [CartController::class, 'destroy']);
-    Route::post('/add', [CartController::class, 'addProducts']);
-    Route::post('/remove', [CartController::class, 'removeProducts']);
-    Route::get('/clear', [CartController::class, 'clearProducts']);
+  Route::get('/{device}', [CartController::class, 'show']);
+  Route::post('/', [CartController::class, 'store']);
+  //    Route::delete('/{device}', [CartController::class, 'destroy']);
+  Route::post('/add', [CartController::class, 'addProducts']);
+  Route::post('/remove', [CartController::class, 'removeProducts']);
+  Route::post('/clear', [CartController::class, 'clearProducts']);
 });
+
 Route::prefix('/shop')->group(function () {
-    Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
-    Route::post('sort', [\App\Http\Controllers\Api\ShopController::class, 'sort']);
-    Route::post('filter/total', [\App\Http\Controllers\Api\ShopController::class, 'total']);
+  Route::post('filter', [\App\Http\Controllers\Api\ShopController::class, 'filter']);
+  Route::post('sort', [\App\Http\Controllers\Api\ShopController::class, 'sort']);
+  Route::post('filter/total', [\App\Http\Controllers\Api\ShopController::class, 'total']);
 });
 Route::prefix('/comments-ratings')->group(function () {
-    Route::get('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'show']);
-    Route::post('/{slug}/new', [\App\Http\Controllers\Api\RatingCommentController::class, 'store']);
-    Route::put('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'update']);
+  Route::get('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'show']);
+  Route::post('/{slug}/new', [\App\Http\Controllers\Api\RatingCommentController::class, 'store']);
+  Route::put('/{slug}', [\App\Http\Controllers\Api\RatingCommentController::class, 'update']);
 });
 
 /*
@@ -145,12 +150,13 @@ Route::prefix('/comments-ratings')->group(function () {
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::prefix('/orders')->group(function (){
-    Route::get('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'store']);
-    Route::get('/{slug}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'showBySlug']);
-    Route::put('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'update']);
-    Route::delete('/{id}', [\App\Http\Controllers\Api\orders\OrderContronller::class, 'destroy']);
+Route::prefix('/orders')->group(function () {
+  Route::get('/', [OrderContronller::class, 'index']);
+  Route::post('/', [OrderContronller::class, 'store']);
+  Route::get('/{uuid}', [OrderContronller::class, 'showByUuid']);
+  Route::get('/cancel/{id}', [OrderContronller::class, 'cancelById']);
+  Route::put('/{id}', [OrderContronller::class, 'updateStatus']);
+  Route::delete('/{id}', [OrderContronller::class, 'destroy']);
 });
 
 /*
@@ -164,11 +170,11 @@ Route::prefix('/orders')->group(function (){
 |
 */
 Route::prefix('/banks')->group(function () {
-   Route::get('/', [BanksController::class, 'index']);
-   Route::post('/', [BanksController::class, 'store']);
-   Route::get('/{id}', [BanksController::class, 'show']);
-   Route::put('/{id}', [BanksController::class, 'update']);
-   Route::delete('/{id}', [BanksController::class, 'destroy']);
+  Route::get('/', [BanksController::class, 'index']);
+  Route::post('/', [BanksController::class, 'store']);
+  Route::get('/{id}', [BanksController::class, 'show']);
+  Route::put('/{id}', [BanksController::class, 'update']);
+  Route::delete('/{id}', [BanksController::class, 'destroy']);
 });
 
 /*
@@ -182,11 +188,11 @@ Route::prefix('/banks')->group(function () {
 |
 */
 Route::prefix('/stores')->group(function () {
-    Route::get('/', [StoresController::class, 'index']);
-    Route::post('/', [StoresController::class, 'store']);
-    Route::get('/{id}', [StoresController::class, 'show']);
-    Route::put('/{id}', [StoresController::class, 'update']);
-    Route::delete('/{id}', [StoresController::class, 'destroy']);
+  Route::get('/', [StoresController::class, 'index']);
+  Route::post('/', [StoresController::class, 'store']);
+  Route::get('/{id}', [StoresController::class, 'show']);
+  Route::put('/{id}', [StoresController::class, 'update']);
+  Route::delete('/{id}', [StoresController::class, 'destroy']);
 });
 
 /*
@@ -200,11 +206,11 @@ Route::prefix('/stores')->group(function () {
 |
 */
 Route::prefix('/payment')->group(function () {
-    Route::get('/', [PaymentController::class, 'index']);
-    Route::post('/', [PaymentController::class, 'store']);
-    Route::get('/{id}', [PaymentController::class, 'show']);
-    Route::put('/{id}', [PaymentController::class, 'update']);
-    Route::delete('/{id}', [PaymentController::class, 'destroy']);
+  Route::get('/', [PaymentController::class, 'index']);
+  Route::post('/', [PaymentController::class, 'store']);
+  Route::get('/{id}', [PaymentController::class, 'show']);
+  Route::put('/{id}', [PaymentController::class, 'update']);
+  Route::delete('/{id}', [PaymentController::class, 'destroy']);
 });
 
 /*
@@ -218,9 +224,31 @@ Route::prefix('/payment')->group(function () {
 |
 */
 Route::prefix('/shipping')->group(function () {
-    Route::get('/', [ShippingController::class, 'index']);
-    Route::post('/', [ShippingController::class, 'store']);
-    Route::get('/{id}', [ShippingController::class, 'show']);
-    Route::put('/{id}', [ShippingController::class, 'update']);
-    Route::delete('/{id}', [ShippingController::class, 'destroy']);
+  Route::get('/', [ShippingController::class, 'index']);
+  Route::post('/', [ShippingController::class, 'store']);
+  Route::get('/{id}', [ShippingController::class, 'show']);
+  Route::put('/{id}', [ShippingController::class, 'update']);
+  Route::delete('/{id}', [ShippingController::class, 'destroy']);
+});
+
+Route::post('/vnpay', [PaymentGatewayController::class, 'vnPay']);
+Route::get('/paypal', [PaymentGatewayController::class, 'paypalShow']);
+Route::post('/paypal-order', [PaymentGatewayController::class, 'paypalStore']);
+
+/*
+|--------------------------------------------------------------------------
+| Transaction Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+Route::prefix('/transaction')->group(function () {
+  Route::get('/', [TransactionsController::class, 'index']);
+  Route::post('/', [TransactionsController::class, 'store']);
+  Route::get('/{id}', [TransactionsController::class, 'show']);
+  Route::put('/{id}', [TransactionsController::class, 'update']);
+  Route::delete('/{id}', [TransactionsController::class, 'destroy']);
 });

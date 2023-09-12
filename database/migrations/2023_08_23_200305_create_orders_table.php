@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('device_id');
+            $table->bigInteger('total_price');
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('fullname')->nullable();
             $table->string('email')->nullable();

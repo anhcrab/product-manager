@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('regular_price')->default(0);
             $table->integer('sale_price')->nullable();
             $table->integer('stock_quantity')->default(0);
-            $table->bigInteger('total_sale')->default(0)->nullable();
+            $table->bigInteger('total_sale')->default(0);
             $table->timestamps();
         });
     }

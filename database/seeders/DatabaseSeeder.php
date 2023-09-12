@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,6 +27,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'client@example.com',
             'password' => bcrypt('123'),
         ]);
-
+        DB::table('categories')->insert([
+            'id' => 1,
+            'name' => 'Uncategorized',
+            'slug' => 'uncategorized'
+        ]);
     }
 }

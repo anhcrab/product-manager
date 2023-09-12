@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.8",
+        "paypal/sdk-core-php": "^3.4",
         "spatie/laravel-medialibrary": "^10.11"
     },
     "require-dev": {

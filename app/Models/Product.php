@@ -11,39 +11,39 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
-    protected $table = 'products';
-    protected $guarded = [ 'id', 'created_at', 'updated_at' ];
+  use HasFactory, InteractsWithMedia;
+  protected $table = 'products';
+  protected $guarded = ['id', 'created_at', 'updated_at'];
 
-    public function type()
-    {
-        return $this->belongsTo(ProductType::class);
-    }
+  public function type()
+  {
+    return $this->belongsTo(ProductType::class);
+  }
 
-    public function category()
-    {
-        return $this->belongsTo(ProductCategory::class);
-    }
+  public function category()
+  {
+    return $this->belongsTo(ProductCategory::class);
+  }
 
-    public function attribute()
-    {
-        return $this->hasMany(ProductAttribute::class);
-    }
+  public function attribute()
+  {
+    return $this->hasMany(ProductAttribute::class);
+  }
 
-    public function tag()
-    {
-        return $this->belongsToMany(ProductTag::class);
-    }
+  public function tag()
+  {
+    return $this->belongsToMany(ProductTag::class);
+  }
 
-    public function registerMediaCollections(Media $media = null): void
-    {
-        $this->addMediaConversion('preview')
-            ->fit(Manipulations::FIT_CROP, 300, 300)
-            ->nonQueued();
-    }
+  public function registerMediaCollections(Media $media = null): void
+  {
+    $this->addMediaConversion('preview')
+      ->fit(Manipulations::FIT_CROP, 300, 300)
+      ->nonQueued();
+  }
 
-    public function ratingComment()
-    {
-        return $this->hasMany(RatingComment::class);
-    }
+  public function ratingComment()
+  {
+    return $this->hasMany(RatingComment::class);
+  }
 }

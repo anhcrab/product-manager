@@ -7,8 +7,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class CartItemCollection extends ResourceCollection
 {
-    public function toArray(Request $request)
-    {
-        //
-    }
+  public function toArray(Request $request)
+  {
+    //
+  }
 }
